@@ -1,7 +1,6 @@
 package com.example.oyun.saveme;
 
-
-import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.hardware.Camera;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -11,11 +10,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -23,7 +26,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     int flag;
     private Camera camera;  //후레쉬 제어를 위해 Camera 객체 생성
@@ -36,8 +39,8 @@ public class MainActivity extends AppCompatActivity{
     int soundID ;
 
 //    ToggleButton emergencybutton;
-//    Button settingbuttion;
-//    Button newsbutton;
+    Button settingbuttion;
+    Button newsbutton;
 
     String phonenumber1;
     String phonenumber2;
@@ -47,39 +50,39 @@ public class MainActivity extends AppCompatActivity{
     String lat;
     String lon;
 
+    LatLng latLng = new LatLng(37.52, 126.93);
+    GoogleMap map;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        android.app.FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-        FragmentMap fragment = new FragmentMap();
-        fragmentTransaction.add(R.id.container, fragment);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
 
         sp = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);   //경보음 재생을 위해 SoundPool API사용
         soundID = sp.load(this, R.raw.emergencysound, 1);
 
 //        emergencybutton = (ToggleButton) findViewById(R.id.emergencyButton);  //토클버튼으로 비상버튼 설정
-//        settingbuttion = (Button) findViewById(R.id.settingButton);   //설정버튼
-//        newsbutton = (Button) findViewById(R.id.newsButton);   //공지사항 버튼
-//
-//        settingbuttion.setOnClickListener(new View.OnClickListener() {   //설정 버튼을 눌렀을 경우
-//            @Override
-//            public void onClick(View view) {
-//                Intent settingintent = new Intent(MainActivity.this, Setting.class);  //설정화면으로 넘김
-//                MainActivity.this.startActivity(settingintent);
-//            }
-//        });
-//
-//        newsbutton.setOnClickListener(new View.OnClickListener() {  //공지사항 버튼을 눌렀을 경우
-//            @Override
-//            public void onClick(View view) {
-//                Intent newsintent = new Intent(MainActivity.this, News.class);  //공지사항화면으로 넘김
-//                MainActivity.this.startActivity(newsintent);
-//            }
-//        });
+        settingbuttion = (Button) findViewById(R.id.settingButton);   //설정버튼
+        newsbutton = (Button) findViewById(R.id.newsButton);   //공지사항 버튼
+
+        settingbuttion.setOnClickListener(new View.OnClickListener() {   //설정 버튼을 눌렀을 경우
+            @Override
+            public void onClick(View view) {
+                Intent settingintent = new Intent(MainActivity.this, Setting.class);  //설정화면으로 넘김
+                MainActivity.this.startActivity(settingintent);
+            }
+        });
+
+        newsbutton.setOnClickListener(new View.OnClickListener() {  //공지사항 버튼을 눌렀을 경우
+            @Override
+            public void onClick(View view) {
+                Intent newsintent = new Intent(MainActivity.this, News.class);  //공지사항화면으로 넘김
+                MainActivity.this.startActivity(newsintent);
+            }
+        });
 
 //        emergencybutton.setOnClickListener(new View.OnClickListener() {    //경보 버튼을 눌렀을 때
 //            @Override
@@ -197,6 +200,20 @@ public class MainActivity extends AppCompatActivity{
         smsManager.sendTextMessage(phonenumber3, null,  "https://maps.google.com/?q="+lat+","+lon, null, null);
     }
 
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        map = googleMap;
+
+        LatLng seoul = new LatLng(37.56, 126.97);
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(seoul);
+        markerOptions.title("씨발");
+        map.addMarker(markerOptions);
+
+        map.moveCamera(CameraUpdateFactory.newLatLng(seoul));
+        CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
+        map.animateCamera(zoom);
+    }
 }
 
 
