@@ -1,37 +1,21 @@
 package com.example.oyun.saveme;
 
 
-import android.Manifest;
-import android.app.Activity;
 import android.app.FragmentTransaction;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.graphics.drawable.ColorDrawable;
 import android.hardware.Camera;
-import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.SoundPool;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -39,7 +23,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MainActivity extends AppCompatActivity{
 
     int flag;
     private Camera camera;  //후레쉬 제어를 위해 Camera 객체 생성
@@ -50,7 +34,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GPS gps;
     SoundPool sp;   //경보음 재생을 위해 SoundPool API사용
     int soundID ;
-    GoogleMap Map;
 
 //    ToggleButton emergencybutton;
 //    Button settingbuttion;
@@ -69,8 +52,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapcontainer);
-        mapFragment.getMapAsync(this);
+        android.app.FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        FragmentMap fragment = new FragmentMap();
+        fragmentTransaction.add(R.id.container, fragment);
 
         sp = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);   //경보음 재생을 위해 SoundPool API사용
         soundID = sp.load(this, R.raw.emergencysound, 1);
@@ -211,18 +197,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         smsManager.sendTextMessage(phonenumber3, null,  "https://maps.google.com/?q="+lat+","+lon, null, null);
     }
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        Map = googleMap;
-
-        LatLng seoul = new LatLng(37.52487, 126.92723);
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(seoul).title("서울이다 씨발");
-
-        Map.addMarker(markerOptions);
-        Map.moveCamera(CameraUpdateFactory.newLatLng(seoul));
-        Map.moveCamera(CameraUpdateFactory.zoomTo(15));
-    }
 }
 
 

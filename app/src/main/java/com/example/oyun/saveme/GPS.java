@@ -142,7 +142,6 @@ public class GPS extends Service implements LocationListener {
             lon = location.getLongitude();
         }
         return lon;   //실제로 메인에 반환되는 값
-        //AAAA
     }
 
     /**
