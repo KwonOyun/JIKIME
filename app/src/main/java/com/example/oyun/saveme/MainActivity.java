@@ -1,17 +1,28 @@
 package com.example.oyun.saveme;
 
+import android.Manifest;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.media.SoundPool;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -27,6 +38,8 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+
+    private static MediaPlayer mp;
 
     int flag;
     private Camera camera;  //후레쉬 제어를 위해 Camera 객체 생성
@@ -53,13 +66,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     LatLng latLng = new LatLng(37.52, 126.93);
     GoogleMap map;
 
+    public NotificationManager nm;
+    public Notification.Builder builder;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        startService(new Intent(getApplicationContext(), LockService.class));
+        mp=MediaPlayer.create(this, R.raw.bgm);
+        mp.setLooping(true);   //무한반복
+        mp.start();            //배경음악 재생시작
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        PermissionCheck();
+
+        notification();
+        add_receiver();
 
         sp = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);   //경보음 재생을 위해 SoundPool API사용
         soundID = sp.load(this, R.raw.emergencysound, 1);
@@ -67,6 +93,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        emergencybutton = (ToggleButton) findViewById(R.id.emergencyButton);  //토클버튼으로 비상버튼 설정
         settingbuttion = (Button) findViewById(R.id.settingButton);   //설정버튼
         newsbutton = (Button) findViewById(R.id.newsButton);   //공지사항 버튼
+
+        settingbuttion.getBackground().setAlpha(50);
+        newsbutton.getBackground().setAlpha(50);
 
         settingbuttion.setOnClickListener(new View.OnClickListener() {   //설정 버튼을 눌렀을 경우
             @Override
@@ -126,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         t.start();
     }
 
-    private void turnOnFlash() {  //Flash On
+    public void turnOnFlash() {  //Flash On
 
         camera = Camera.open();
         Camera.Parameters param = camera.getParameters();
@@ -136,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         isFlashOn = false;  //isFlashOn변수를 false로 설정하여 flash가 다시 꺼지게 함.
     }
 
-    private void turnOffFlash() { //Flash off
+    public void turnOffFlash() { //Flash off
 
         Camera.Parameters param = camera.getParameters();
         param.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
@@ -213,6 +242,89 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         map.moveCamera(CameraUpdateFactory.newLatLng(seoul));
         CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
         map.animateCamera(zoom);
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+
+        nm.cancelAll();
+        builder.setAutoCancel(true);
+        System.exit(0);
+    }
+
+    public void notification(){
+        nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        builder = new Notification.Builder(getApplicationContext());
+        builder.setSmallIcon(R.drawable.customer);
+        builder.setTicker("Sample");
+        builder.setWhen(System.currentTimeMillis());
+        builder.setNumber(10);
+        builder.setContentTitle("Title");
+        builder.setContentText("");
+        Notification noti = builder.build();
+
+        RemoteViews contentiew = new RemoteViews(getPackageName(), R.layout.remoteview);
+
+        Intent intent_call_police = new Intent("call_police");
+        PendingIntent pendingIntent_call_police = PendingIntent.getBroadcast(this, 0, intent_call_police,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent intent_message = new Intent("message");
+        PendingIntent pendingIntent_message = PendingIntent.getBroadcast(this, 0, intent_message,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent intent_siren_message = new Intent("siren_message");
+        PendingIntent pendingIntent_siren_message = PendingIntent.getBroadcast(this, 0, intent_siren_message,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent intent_siren_flash = new Intent("siren_flash");
+        PendingIntent pendingIntent_siren_flash = PendingIntent.getBroadcast(this, 0, intent_siren_flash,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        contentiew.setOnClickPendingIntent(R.id.button, pendingIntent_call_police);
+        contentiew.setOnClickPendingIntent(R.id.button1, pendingIntent_message);
+        contentiew.setOnClickPendingIntent(R.id.button2, pendingIntent_siren_message);
+        contentiew.setOnClickPendingIntent(R.id.button3, pendingIntent_siren_flash);
+
+        noti.contentView = contentiew;
+        nm.notify(123123, noti);
+
+    }
+
+    public void PermissionCheck(){
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE);
+        if(permissionCheck == PackageManager.PERMISSION_GRANTED){
+            Toast.makeText(this, "권한 있음", Toast.LENGTH_LONG).show();
+        }
+        else{
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE}, 1);
+        }
+    }
+    public void add_receiver(){
+        MyReceiver myreceiver = new MyReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("call_police");
+        intentFilter.addAction("message");
+        intentFilter.addAction("siren_message");
+        intentFilter.addAction("siren_flash");
+
+        registerReceiver(myreceiver, intentFilter);
+    }
+
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults){
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case 1:{
+                if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    Toast.makeText(this, "승인됨",Toast.LENGTH_LONG).show();
+                }
+                else{
+                    Toast.makeText(this, "거절됨", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+        }
     }
 }
 

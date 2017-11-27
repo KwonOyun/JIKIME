@@ -114,10 +114,8 @@ public class Setting extends AppCompatActivity {
 
     public String LoadData(){  //등록정보확인
         StringBuffer buffer = new StringBuffer();
-
         try{
             FileInputStream fis = openFileInput("savemedatainformation.txt");
-
             BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
             String str = reader.readLine();
 
