@@ -63,7 +63,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     String lat;
     String lon;
 
-    LatLng latLng = new LatLng(37.52, 126.93);
     GoogleMap map;
 
     public NotificationManager nm;
@@ -256,8 +255,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void notification(){
         nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         builder = new Notification.Builder(getApplicationContext());
-        builder.setSmallIcon(R.drawable.customer);
-        builder.setTicker("Sample");
+        builder.setSmallIcon(R.drawable.emergencybutton);
+        builder.setTicker("JIKIME");
         builder.setWhen(System.currentTimeMillis());
         builder.setNumber(10);
         builder.setContentTitle("Title");
