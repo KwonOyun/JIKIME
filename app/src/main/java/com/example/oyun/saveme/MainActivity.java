@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     SoundPool sp;   //경보음 재생을 위해 SoundPool API사용
     int soundID ;
 
-//    ToggleButton emergencybutton;
     Button settingbuttion;
     Button newsbutton;
 
@@ -89,7 +88,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         sp = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);   //경보음 재생을 위해 SoundPool API사용
         soundID = sp.load(this, R.raw.emergencysound, 1);
 
-//        emergencybutton = (ToggleButton) findViewById(R.id.emergencyButton);  //토클버튼으로 비상버튼 설정
         settingbuttion = (Button) findViewById(R.id.settingButton);   //설정버튼
         newsbutton = (Button) findViewById(R.id.newsButton);   //공지사항 버튼
 
@@ -111,28 +109,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 MainActivity.this.startActivity(newsintent);
             }
         });
-
-//        emergencybutton.setOnClickListener(new View.OnClickListener() {    //경보 버튼을 눌렀을 때
-//            @Override
-//            public void onClick(View view) {
-//                if (emergencybutton.isChecked()) {
-//                    flag = 0;
-//                    blink();  //점멸 Turn On
-//                    SoundOn();  //소리 On
-//                    FindLocation();  //위도 경도 찾기
-//                    LoadData();   //설정되어 있는 번호 불러오기
-//                    SendMessage();  //설정되어 있는 번호로 문자 보내기
-//                    SendLocation();   //설정되어 있는 번호로 위치정보 보내기
-//                } else {
-//                    flag = 1;
-//                    SoundOff();  //소리 OFF
-//                    blink(); //점멸 Turn Off
-//                    LocationOff(); //GPS 종료
-//                }
-//            }
-//        });
     }
-
 
     private void blink() {  //점멸하는 메소드
         Thread t = new Thread() {  //스레드 생성
@@ -219,7 +196,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         smsManager.sendTextMessage(phonenumber1, null,  emergencysms, null, null);   //첫번째 번호로 문자 메세지 보내기
         smsManager.sendTextMessage(phonenumber2, null,  emergencysms, null, null);   //두번째 번호로 문자 메세지 보내기
         smsManager.sendTextMessage(phonenumber3, null,  emergencysms, null, null);   //세번째 번호로 문자 메세지 보내기
-
     }
 
     public void SendLocation(){  //위치를 전송해주는 메소드
@@ -231,13 +207,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
-
         LatLng seoul = new LatLng(37.56, 126.97);
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(seoul);
         markerOptions.title("씨발");
         map.addMarker(markerOptions);
-
         map.moveCamera(CameraUpdateFactory.newLatLng(seoul));
         CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
         map.animateCamera(zoom);
@@ -246,7 +220,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onDestroy(){
         super.onDestroy();
-
         nm.cancelAll();
         builder.setAutoCancel(true);
         System.exit(0);

@@ -41,28 +41,37 @@
         <activity
             android:name=".News"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".PopUpActivity" android:theme="@android:style/Theme.Dialog" />
 
         <receiver
             android:name=".MyReceiver"
             android:enabled="true"
             android:exported="true" />
-        <receiver android:name=".ScreenReceiver" android:enabled="true" android:exported="true">
+        <receiver
+            android:name=".ScreenReceiver"
+            android:enabled="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.media.VOLUME_CHANGED_ACTION" />
-                <action android:name="android.intent.action.SCREEN_OFF"/>
-                <action android:name="android.intent.action.SCREEN_ON"/>
-                <action android:name="android.intent.action.USER_PRESENT"/>
-                <action android:name="android.intent.action.ACTION_SHUTDOWN"/>
-                <action android:name="android.intent.action.ACTION_SHUTDOWN"/>
+                <action android:name="android.intent.action.SCREEN_OFF" />
+                <action android:name="android.intent.action.SCREEN_ON" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+                <action android:name="android.intent.action.ACTION_SHUTDOWN" />
+                <action android:name="android.intent.action.ACTION_SHUTDOWN" />
             </intent-filter>
         </receiver>
 
-        <service android:name=".LockService" android:enabled="true" android:exported="true">
+        <service
+            android:name=".LockService"
+            android:enabled="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.media.VOLUME_CHANGED_ACTION" />
             </intent-filter>
         </service>
+
+        <activity android:name=".PopUpActivity"></activity>
     </application>
 
 </manifest>
