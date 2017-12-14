@@ -41,7 +41,8 @@
         <activity
             android:name=".News"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".PopUpActivity" android:theme="@android:style/Theme.Dialog" />
+
+        <activity android:name=".PopUpActivity" android:theme="@style/Theme.MyDialog"></activity>
 
         <receiver
             android:name=".MyReceiver"
@@ -70,8 +71,6 @@
                 <action android:name="android.media.VOLUME_CHANGED_ACTION" />
             </intent-filter>
         </service>
-
-        <activity android:name=".PopUpActivity"></activity>
     </application>
 
 </manifest>

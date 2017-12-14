@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -33,6 +34,8 @@ public class Setting extends AppCompatActivity {
     EditText p3;  //세번째 번호
     EditText smsmessage; //보낼 메시지 내용
 
+    TextView guide;
+
     Button settingbutton;  //설정 버튼
     Button checkingbutton;  //등록 정보 확인 버튼
 
@@ -45,6 +48,7 @@ public class Setting extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
 
+        guide = (TextView) findViewById(R.id.how);
         spinner = (Spinner) findViewById(R.id.residenceSpinner);
         adapter = ArrayAdapter.createFromResource(this, R.array.residence, R.layout.support_simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
@@ -54,6 +58,16 @@ public class Setting extends AppCompatActivity {
         smsmessage = (EditText) findViewById(R.id.Smsmessage); //보낼 메시지 내용
         settingbutton = (Button) findViewById(R.id.settingfinish);  //설정 버튼
         checkingbutton = (Button) findViewById(R.id.settingcheck);  //등록 정보 확인 버튼
+
+        guide.setOnClickListener(new View.OnClickListener() {  //팝업창 띄우기
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), PopUpActivity.class);
+                intent.putExtra("data", "1. 비상시 연락이 갈 번호를 입력하여주세요.\n2. 비상시 보낼 문자메세지를 입력하여주세요\n3. 번호와 문자메세지 내용을 입력하셨으면 설정 버튼을 클릭하여 주십시오.\n4. 게시판을 통해서 안전정보의 소식 및 업데이트 정보를 만나보실 수 있습니다.\n5. 상황에 맞게 Notification을 클릭하여 비상시를 대처하세요.\n6.위급상황시에 홀드 버튼을 5번 연속으로 누르세요.");
+                startActivityForResult(intent, 1);
+            }
+        });
+
 
         p1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,6 +157,7 @@ public class Setting extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {  //전화번호부 정보를 받아주는 onActivityResult메소드
         super.onActivityResult(requestCode, resultCode, data);
+
         if(resultCode != RESULT_OK){
             return;
         }

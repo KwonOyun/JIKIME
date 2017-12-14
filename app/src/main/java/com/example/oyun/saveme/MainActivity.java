@@ -1,12 +1,14 @@
 package com.example.oyun.saveme;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.location.LocationListener;
@@ -64,13 +66,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     GoogleMap map;
 
+    int checkFlag = 0;
     public NotificationManager nm;
     public Notification.Builder builder;
+
+    SharedPreferences setting;
+    SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+//        setting = getSharedPreferences("test", MODE_PRIVATE);
+//        editor = setting.edit();
+//        checkFlag = setting.getInt("flag", 1);
+//        if(checkFlag!=1){
+            Intent intent = new Intent(getApplicationContext(), PopUpActivity.class);
+            intent.putExtra("data", "1. 비상시 연락이 갈 번호를 입력하여주세요.\n2. 비상시 보낼 문자메세지를 입력하여주세요\n3. 번호와 문자메세지 내용을 입력하셨으면 설정 버튼을 클릭하여 주십시오.\n4. 게시판을 통해서 안전정보의 소식 및 업데이트 정보를 만나보실 수 있습니다.\n5. 상황에 맞게 Notification을 클릭하여 비상시를 대처하세요.\n6.위급상황시에 홀드 버튼을 5번 연속으로 누르세요.");
+            startActivityForResult(intent, 1);
+//        }
+//        editor.putInt("flag", 1);
+//        editor.commit();
+//        ReadShared();
+//        WriteShared();
 
         startService(new Intent(getApplicationContext(), LockService.class));
         mp=MediaPlayer.create(this, R.raw.bgm);
@@ -109,6 +128,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 MainActivity.this.startActivity(newsintent);
             }
         });
+    }
+
+    public void ReadShared(){
+        checkFlag = setting.getInt("flag", 0);
+        if(checkFlag!=1){
+            Intent intent = new Intent(getApplicationContext(), PopUpActivity.class);
+            intent.putExtra("data", "Test Popup");
+            startActivityForResult(intent, 1);
+        }
+    }
+
+    public void WriteShared(){
+        SharedPreferences.Editor editor = setting.edit();
+        editor.putInt("flag", 1);
+        editor.commit();
     }
 
     private void blink() {  //점멸하는 메소드
@@ -267,7 +301,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void PermissionCheck(){
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE);
         if(permissionCheck == PackageManager.PERMISSION_GRANTED){
-            Toast.makeText(this, "권한 있음", Toast.LENGTH_LONG).show();
         }
         else{
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE}, 1);
